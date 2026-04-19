@@ -25,6 +25,11 @@ canvas#game-canvas { display: block; width: 100vw; height: 100vh; }
   color: #6a5a4a; font-size: 0.85rem; letter-spacing: 0.5em;
   text-transform: uppercase;
 }
+.loading-story {
+  color: #5a4a3a; font-size: 0.78rem; max-width: 320px;
+  margin: 1.5rem auto 0; line-height: 1.6; text-align: center;
+  min-height: 2.4em; transition: opacity 0.5s;
+}
 
 .clay-loader { display: flex; gap: 14px; justify-content: center; margin-bottom: 2.5rem; }
 .clay-blob {

@@ -11,10 +11,30 @@
   async function boot() {
     const canvas = document.getElementById('game-canvas');
 
+    // Loading stories
+    const stories = [
+      '泥灵界的造物主沉睡千年，留下无数黏土碎片散落四方……',
+      '塑灵师们用双手赋予泥土灵魂，用魔法唤醒沉睡的力量……',
+      '据说在世界尽头，有一座远古黏土巨人等待着被唤醒……',
+      '四色魔法黏土：火焰之红、流水之蓝、风暴之白、生命之绿……',
+      '新的塑灵师即将踏入这片神奇的土地……',
+    ];
+
     // Simulate loading
-    for (let i = 0; i <= 100; i += 5) {
+    for (let i = 0; i <= 100; i += 4) {
       UI.showLoading(i);
-      await sleep(30);
+      const storyEl = document.getElementById('loading-story');
+      if (storyEl) {
+        const storyIdx = Math.floor((i / 100) * stories.length);
+        if (storyIdx < stories.length && storyEl.textContent !== stories[storyIdx]) {
+          storyEl.style.opacity = '0';
+          setTimeout(() => {
+            storyEl.textContent = stories[storyIdx];
+            storyEl.style.opacity = '1';
+          }, 200);
+        }
+      }
+      await sleep(35);
     }
 
     // Init engine
@@ -37,6 +57,7 @@
     Tooltip.init();
     Minimap.init();
     InteractPrompt.init();
+    ScreenFX.init();
     UI.init();
 
     // Hide loading, show title
@@ -152,6 +173,9 @@
 
         // Update interact prompt
         updateInteractPrompt(camera.position);
+
+        // Update screen effects
+        ScreenFX.update();
       }
 
       Engine.getRenderer().render(Engine.getScene(), Engine.getCamera());
@@ -309,6 +333,7 @@
     }
 
     AudioSystem.playSFX('spell');
+    ScreenFX.magicGlow(SpellSystem.SPELL_COLORS[SpellSystem.getCurrentSpell()]);
     QuestSystem.completeObjective('first_steps', 'cast_spell');
   }
 
