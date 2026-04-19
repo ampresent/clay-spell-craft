@@ -56,6 +56,7 @@
     QuestSystem.init();
     DayNight.init(scene);
     Weather.init(scene);
+    NightEvents.init(scene);
     AudioSystem.init();
     Settings.init();
     Tooltip.init();
@@ -175,6 +176,7 @@
         Enemies.update(delta, gameTime, Engine.getCamera().position);
         DayNight.update(delta);
         Weather.update(delta, gameTime);
+        NightEvents.update(gameTime);
 
         // Achievement tracking
         if (DayNight.isNight()) Achievements.track('night');
@@ -313,6 +315,17 @@
       }
     }
 
+    // Ghost NPC (night only)
+    const ghost = NightEvents.getGhostNPC();
+    if (ghost && ghost.visible) {
+      const dist = cameraPos.distanceTo(ghost.position);
+      if (dist < 4) {
+        UI.showNPCDialog(ghost.userData.data, 'greeting');
+        AudioSystem.playSFX('dialog');
+        return;
+      }
+    }
+
     // Clay nodes & collectibles
     const target = Engine.getRaycastTarget(5);
     if (target) {
@@ -381,8 +394,11 @@
       const dir = toEnemy.normalize();
       const dot = forward.dot(dir);
       if (dot > 0.9 && dist < 8) {
-        const damage = spellType === 'sculpt' ? 5 : 10 + (spellType === 'fire' ? 5 : 0);
-        Enemies.damageEnemy(enemy, damage);
+        const baseDamage = Player.getAttack();
+        const spellBonus = spellType === 'fire' ? 5 : spellType === 'water' ? 3 : spellType === 'wind' ? 2 : spellType === 'life' ? 0 : 1;
+        const totalDamage = baseDamage + spellBonus;
+        Enemies.damageEnemy(enemy, totalDamage);
+        if (enemy.userData.hp <= 0) Player.addXP(enemy.userData.template.xp);
         SpellSystem.castAt(enemy.position);
         AudioSystem.playSFX('spell');
         ScreenFX.magicGlow(SpellSystem.SPELL_COLORS[spellType]);
