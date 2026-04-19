@@ -283,6 +283,14 @@ const Structures = (() => {
       { id: 'scholar_notes', x: -5.5, z: 8.5, label: '瓷小姐的研究笔记' },
       { id: 'titan_whispers', x: -20, z: -16, label: '巨人的低语' },
       { id: 'elder_diary', x: -0.5, z: -5, label: '泥爷爷的日记' },
+      { id: 'ghost_letter', x: -14, z: 14, label: '一封未寄出的信' },
+      { id: 'war_survivor', x: -5.5, z: 9, label: '战争幸存者口述' },
+      { id: 'titan_construction', x: -23, z: -19, label: '巨人建造记录' },
+      { id: 'shadow_research', x: -6, z: 9.5, label: '暗影腐蚀预测' },
+      { id: 'apprentice_diary', x: 0.5, z: -4, label: '少年日记' },
+      { id: 'forbidden_experiment', x: -6, z: -23, label: '虚空实验记录' },
+      { id: 'fairy_tale', x: -1.5, z: -2, label: '塑形者的礼物' },
+      { id: 'elder_secrets', x: -2, z: -5.5, label: '泥鸿远密函' },
     ];
 
     for (const b of bookLocations) {

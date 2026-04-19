@@ -120,7 +120,48 @@ const UI = (() => {
       return;
     }
     showDialog(npcData.emoji, npcData.name, dialog.text);
-    dialogQueue = dialog.next ? [{ npcData, dialogId: dialog.next }] : [];
+
+    // Execute dialog action
+    if (dialog.action) {
+      handleDialogAction(dialog.action, npcData);
+    }
+
+    // Build queue from 'next' chain
+    dialogQueue = [];
+    if (dialog.next) {
+      dialogQueue.push({ npcData, dialogId: dialog.next });
+    }
+  }
+
+  function handleDialogAction(action, npcData) {
+    switch (action) {
+      case 'start_quest':
+        QuestSystem.completeObjective('first_steps', 'talk_elder');
+        break;
+      case 'give_book_creation':
+        Books.collect('creation_vol3');
+        break;
+      case 'give_book_notes':
+        Books.collect('scholar_notes');
+        break;
+      case 'unlock_recipe':
+        // Recipe unlock handled elsewhere
+        break;
+      case 'open_shop':
+        // Shop available via F key
+        break;
+      case 'open_library':
+        Books.renderLibrary();
+        break;
+      case 'complete_talk_scholar':
+        QuestSystem.completeObjective('meet_scholar', 'talk_scholar');
+        break;
+      case 'complete_talk_merchant':
+        QuestSystem.completeObjective('merchant_secret', 'talk_merchant_deep');
+        break;
+      default:
+        console.log('Unknown dialog action:', action);
+    }
   }
 
   function advanceDialog() {
