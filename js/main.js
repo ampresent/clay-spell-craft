@@ -48,9 +48,11 @@
     Effects.init(scene);
     Landmarks.init(scene);
     Collectibles.init(scene);
+    Dungeons.init(scene);
     ClaySystem.init(scene);
     SpellSystem.init(scene);
     Characters.init(scene);
+    Enemies.init(scene);
     QuestSystem.init();
     DayNight.init(scene);
     Weather.init(scene);
@@ -166,9 +168,11 @@
         Effects.update(gameTime);
         Landmarks.update(gameTime);
         Collectibles.update(gameTime);
+        Dungeons.update(gameTime);
         SpellSystem.update(delta);
         ClaySystem.update(gameTime, delta);
         Characters.update(gameTime);
+        Enemies.update(delta, gameTime, Engine.getCamera().position);
         DayNight.update(delta);
         Weather.update(delta, gameTime);
 
@@ -359,17 +363,46 @@
 
   function handleCastSpell() {
     const target = Engine.getRaycastTarget(12);
+    const spellType = SpellSystem.getCurrentSpell();
+
+    // Check for enemy hit
+    const enemies = Enemies.getEnemies();
+    const camera = Engine.getCamera();
+    const camPos = camera.position;
+    const forward = Engine.getCameraForward();
+
+    for (const enemy of enemies) {
+      if (!enemy.userData.alive) continue;
+      const toEnemy = new THREE.Vector3().subVectors(enemy.position, camPos);
+      const dist = toEnemy.length();
+      if (dist > 12) continue;
+
+      // Dot product check (rough cone)
+      const dir = toEnemy.normalize();
+      const dot = forward.dot(dir);
+      if (dot > 0.9 && dist < 8) {
+        const damage = spellType === 'sculpt' ? 5 : 10 + (spellType === 'fire' ? 5 : 0);
+        Enemies.damageEnemy(enemy, damage);
+        SpellSystem.castAt(enemy.position);
+        AudioSystem.playSFX('spell');
+        ScreenFX.magicGlow(SpellSystem.SPELL_COLORS[spellType]);
+        Achievements.track('spell', spellType);
+        QuestSystem.completeObjective('first_steps', 'cast_spell');
+        return;
+      }
+    }
+
+    // No enemy hit, cast at point
     if (target) {
       SpellSystem.castAt(target.point);
     } else {
-      const camera = Engine.getCamera();
-      const pos = camera.position.clone().add(Engine.getCameraForward().multiplyScalar(8));
+      const pos = camPos.clone().add(forward.multiplyScalar(8));
       SpellSystem.castAt(pos);
     }
 
     AudioSystem.playSFX('spell');
-    ScreenFX.magicGlow(SpellSystem.SPELL_COLORS[SpellSystem.getCurrentSpell()]);
-    Achievements.track('spell', SpellSystem.getCurrentSpell());
+    ScreenFX.magicGlow(SpellSystem.SPELL_COLORS[spellType]);
+    Achievements.track('spell', spellType);
     QuestSystem.completeObjective('first_steps', 'cast_spell');
   }
 
