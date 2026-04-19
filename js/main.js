@@ -38,6 +38,13 @@
     // Hide loading, show title
     UI.hideLoading();
 
+    // Start title background particles
+    const titleBgCanvas = document.getElementById('title-bg-canvas');
+    if (titleBgCanvas) {
+      ParticlesBg.init(titleBgCanvas);
+      ParticlesBg.start();
+    }
+
     // Check for save
     if (SaveSystem.hasSave()) {
       const info = SaveSystem.getSaveInfo();
@@ -137,6 +144,7 @@
 
   function startGame() {
     gameStarted = true;
+    ParticlesBg.stop();
     UI.hideTitle();
     UI.showHUD();
 
