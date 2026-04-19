@@ -119,14 +119,14 @@ const Engine = (() => {
     direction.x = Number(rgt) - Number(lft);
     direction.normalize();
 
-    if (moveForward || moveBackward) velocity.z -= direction.z * MOVE_SPEED * delta;
-    if (moveLeft || moveRight) velocity.x -= direction.x * MOVE_SPEED * delta;
+    if (fwd || bwd) velocity.z += direction.z * MOVE_SPEED * delta;
+    if (lft || rgt) velocity.x += direction.x * MOVE_SPEED * delta;
 
     // Apply movement relative to camera yaw
     const sinY = Math.sin(yaw);
     const cosY = Math.cos(yaw);
-    camera.position.x += (-velocity.x * cosY - velocity.z * sinY);
-    camera.position.z += (velocity.x * sinY - velocity.z * cosY);
+    camera.position.x += (velocity.x * cosY - velocity.z * sinY);
+    camera.position.z += (-velocity.x * sinY - velocity.z * cosY);
 
     // Ground clamp
     const groundY = World.getGroundHeight(camera.position.x, camera.position.z);
