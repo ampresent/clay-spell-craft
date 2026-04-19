@@ -223,6 +223,33 @@ canvas#game-canvas { display: block; width: 100vw; height: 100vh; }
 .notification.fadeout { animation: notifOut 0.5s forwards; }
 @keyframes notifOut { to { opacity: 0; transform: translateX(-50%) translateY(-10px); } }
 
+/* Quest Panel */
+#quest-panel {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  width: min(500px, 90vw); max-height: 70vh;
+  background: rgba(10,10,18,0.95); border: 1px solid rgba(200,122,74,0.3);
+  border-radius: 12px; padding: 24px 28px; backdrop-filter: blur(16px);
+  overflow-y: auto;
+}
+#quest-panel h2 { color: #e8c87a; font-size: 1.2rem; margin-bottom: 16px; }
+.quest-item {
+  background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 8px; padding: 14px 16px; margin-bottom: 10px;
+}
+.quest-item.completed { opacity: 0.5; }
+.quest-item.locked { opacity: 0.3; }
+.quest-title { color: #e8c87a; font-weight: 700; font-size: 0.95rem; margin-bottom: 6px; }
+.quest-desc { color: #8a7a6a; font-size: 0.8rem; margin-bottom: 8px; }
+.quest-obj { color: #a09888; font-size: 0.8rem; padding: 2px 0; padding-left: 12px; }
+.quest-obj.done { color: #44cc66; text-decoration: line-through; }
+.quest-reward { color: #c87a4a; font-size: 0.75rem; margin-top: 6px; font-style: italic; }
+#quest-close {
+  display: block; margin: 12px auto 0;
+  padding: 8px 24px; background: rgba(255,255,255,0.06);
+  color: #8a7a6a; border: none; border-radius: 4px;
+  cursor: pointer; font-family: 'Noto Sans SC', sans-serif;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .game-title { font-size: 3rem; }

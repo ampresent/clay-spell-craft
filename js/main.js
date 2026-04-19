@@ -26,6 +26,8 @@
     ClaySystem.init(scene);
     SpellSystem.init(scene);
     Characters.init(scene);
+    QuestSystem.init();
+    DayNight.init(scene);
     UI.init();
 
     // Hide loading, show title
@@ -68,6 +70,15 @@
     Engine.on('escape', () => {
       if (UI.isCraftOpen()) UI.closeCraft();
       if (UI.isDialogActive()) UI.closeDialog();
+      const qp = document.getElementById('quest-panel');
+      if (qp.style.display !== 'none') qp.style.display = 'none';
+    });
+
+    // Q key for quest panel
+    document.addEventListener('keydown', (e) => {
+      if (e.code === 'KeyQ' && gameStarted && !UI.isDialogActive()) {
+        toggleQuestPanel();
+      }
     });
 
     // Main loop
@@ -83,6 +94,15 @@
         SpellSystem.update(delta);
         ClaySystem.update(gameTime, delta);
         Characters.update(gameTime);
+        DayNight.update(delta);
+
+        // Update time display
+        const timeStr = DayNight.getTimeString();
+        const timeEl = document.getElementById('time-display');
+        if (timeEl) {
+          const nightIcon = DayNight.isNight() ? '🌙' : '☀️';
+          timeEl.textContent = `${nightIcon} ${timeStr}`;
+        }
 
         // Update minimap
         const camera = Engine.getCamera();
@@ -105,7 +125,7 @@
     // Initial dialog
     setTimeout(() => {
       UI.showDialog('🌍', '泥灵界',
-        '你踏入了泥灵界。远处有一位老人正在捏着什么……也许该去打个招呼。'
+        '你踏入了泥灵界。远处有一位老人正在捏着什么……也许该去打个招呼。\n\n提示：按 Q 查看任务日志'
       );
     }, 1500);
   }
@@ -122,6 +142,13 @@
       if (dist < 4) {
         const data = npc.userData.data;
         UI.showNPCDialog(data, 'greeting');
+
+        // Quest completion
+        if (npc.userData.npcKey === 'elder') {
+          QuestSystem.completeObjective('first_steps', 'talk_elder');
+        } else if (npc.userData.npcKey === 'scholar') {
+          QuestSystem.completeObjective('meet_scholar', 'talk_scholar');
+        }
         return;
       }
     }
@@ -136,6 +163,12 @@
 
       // Visual feedback
       SpellSystem.castAt(target.point);
+
+      // Quest completion
+      QuestSystem.completeObjective('first_steps', 'harvest_clay');
+      if (ClaySystem.getClayAmount() >= 10) {
+        QuestSystem.completeObjective('first_assistant', 'collect_10_clay');
+      }
 
       if (node.userData.amount <= 0) {
         Engine.getScene().remove(node);
@@ -165,11 +198,46 @@
     if (target) {
       SpellSystem.castAt(target.point);
     } else {
-      // Cast at air
       const camera = Engine.getCamera();
       const pos = camera.position.clone().add(Engine.getCameraForward().multiplyScalar(8));
       SpellSystem.castAt(pos);
     }
+
+    // Quest completion
+    QuestSystem.completeObjective('first_steps', 'cast_spell');
+  }
+
+  function toggleQuestPanel() {
+    const panel = document.getElementById('quest-panel');
+    if (panel.style.display === 'none' || !panel.style.display) {
+      renderQuestPanel();
+      panel.style.display = 'block';
+    } else {
+      panel.style.display = 'none';
+    }
+  }
+
+  function renderQuestPanel() {
+    const list = document.getElementById('quest-list');
+    const allQuests = QuestSystem.getAllQuests();
+    list.innerHTML = '';
+
+    allQuests.forEach(quest => {
+      const div = document.createElement('div');
+      div.className = `quest-item ${quest.status}`;
+
+      let objHtml = quest.objectives.map(o =>
+        `<div class="quest-obj ${o.done ? 'done' : ''}">${o.done ? '✓' : '○'} ${o.text}</div>`
+      ).join('');
+
+      div.innerHTML = `
+        <div class="quest-title">${quest.title} ${quest.status === 'locked' ? '🔒' : quest.status === 'completed' ? '✅' : ''}</div>
+        <div class="quest-desc">${quest.description}</div>
+        ${objHtml}
+        <div class="quest-reward">🎁 ${quest.reward}</div>
+      `;
+      list.appendChild(div);
+    });
   }
 
   function sleep(ms) {
