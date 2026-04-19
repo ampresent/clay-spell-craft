@@ -55,6 +55,7 @@
     DayNight.init(scene);
     Weather.init(scene);
     AudioSystem.init();
+    Settings.init();
     Tooltip.init();
     Minimap.init();
     Compass.init();
@@ -116,18 +117,20 @@
     });
 
     Engine.on('escape', () => {
-      if (UI.isCraftOpen()) UI.closeCraft();
-      if (UI.isDialogActive()) UI.closeDialog();
-      const qp = document.getElementById('quest-panel');
-      if (qp.style.display !== 'none') qp.style.display = 'none';
-      const ip = document.getElementById('inventory-panel');
-      if (ip.style.display !== 'none') ip.style.display = 'none';
-      const ap = document.getElementById('abilities-panel');
-      if (ap.style.display !== 'none') ap.style.display = 'none';
-      const rp = document.getElementById('recipes-panel');
-      if (rp.style.display !== 'none') rp.style.display = 'none';
-      const achp = document.getElementById('achievements-panel');
-      if (achp.style.display !== 'none') achp.style.display = 'none';
+      if (UI.isCraftOpen()) { UI.closeCraft(); return; }
+      if (UI.isDialogActive()) { UI.closeDialog(); return; }
+      // Close any open panel
+      const panels = ['quest-panel', 'inventory-panel', 'abilities-panel', 'recipes-panel', 'achievements-panel', 'settings-panel'];
+      let closed = false;
+      panels.forEach(id => {
+        const el = document.getElementById(id);
+        if (el && el.style.display !== 'none') { el.style.display = 'none'; closed = true; }
+      });
+      // If nothing was open, show settings
+      if (!closed && gameStarted) {
+        Settings.render();
+        document.getElementById('settings-panel').style.display = 'block';
+      }
     });
 
     // Q key for quest panel, I for inventory, F5 for save
