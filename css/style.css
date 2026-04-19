@@ -718,6 +718,35 @@ canvas#game-canvas { display: block; width: 100vw; height: 100vh; }
 }
 #shop-close:hover { background: rgba(255,255,255,0.05); color: #8a7a6a; }
 
+/* === World Map Panel === */
+#worldmap-panel {
+  position: fixed; inset: 0; z-index: 500;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  background: rgba(0,0,0,0.85);
+  animation: fadeIn 0.3s ease-out;
+}
+@keyframes fadeIn { from { opacity: 0; } }
+#worldmap-panel h2 {
+  color: #e8c87a; font-size: 1.2rem; margin-bottom: 16px;
+  letter-spacing: 0.1em;
+}
+#worldmap-canvas {
+  width: min(500px, 80vw); height: min(500px, 80vw);
+  border: 1px solid rgba(200,122,74,0.2);
+  border-radius: 12px;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+}
+#worldmap-close {
+  margin-top: 16px;
+  padding: 8px 28px; background: rgba(255,255,255,0.03);
+  color: #6a5a4a; border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 6px; cursor: pointer;
+  font-family: 'Noto Sans SC', sans-serif; font-size: 0.8rem;
+  transition: all 0.2s;
+}
+#worldmap-close:hover { background: rgba(255,255,255,0.05); color: #8a7a6a; }
+
 /* === Crosshair === */
 .crosshair {
   position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%);

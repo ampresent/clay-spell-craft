@@ -72,6 +72,7 @@
     Tooltip.init();
     Minimap.init();
     Compass.init();
+    WorldMap.init();
     InteractPrompt.init();
     ScreenFX.init();
     UI.init();
@@ -133,7 +134,7 @@
       if (UI.isCraftOpen()) { UI.closeCraft(); return; }
       if (UI.isDialogActive()) { UI.closeDialog(); return; }
       // Close any open panel
-      const panels = ['quest-panel', 'inventory-panel', 'abilities-panel', 'recipes-panel', 'achievements-panel', 'settings-panel', 'shop-panel'];
+      const panels = ['quest-panel', 'inventory-panel', 'abilities-panel', 'recipes-panel', 'achievements-panel', 'settings-panel', 'shop-panel', 'worldmap-panel'];
       let closed = false;
       panels.forEach(id => {
         const el = document.getElementById(id);
@@ -161,6 +162,8 @@
         toggleAchievementsPanel();
       } else if (e.code === 'KeyF') {
         if (Shop.isOpen()) Shop.close(); else Shop.open();
+      } else if (e.code === 'KeyM') {
+        WorldMap.toggle();
       } else if (e.code === 'F5') {
         e.preventDefault();
         doSave();
