@@ -36,6 +36,7 @@
     AudioSystem.init();
     Tooltip.init();
     Minimap.init();
+    InteractPrompt.init();
     UI.init();
 
     // Hide loading, show title
@@ -148,6 +149,9 @@
         const camera = Engine.getCamera();
         const clayNodes = World.getInteractables().filter(o => o.userData.type === 'clayNode');
         Minimap.render(camera.position, Characters.getNPCs(), ClaySystem.getAssistants(), clayNodes);
+
+        // Update interact prompt
+        updateInteractPrompt(camera.position);
       }
 
       Engine.getRenderer().render(Engine.getScene(), Engine.getCamera());
@@ -339,6 +343,37 @@
     } else {
       panel.style.display = 'none';
     }
+  }
+
+  function updateInteractPrompt(cameraPos) {
+    // Check NPCs
+    const npcs = Characters.getNPCs();
+    for (const npc of npcs) {
+      const dist = cameraPos.distanceTo(npc.position);
+      if (dist < 4) {
+        InteractPrompt.show('E', `与 ${npc.userData.data.name} 交谈`);
+        return;
+      }
+    }
+
+    // Check clay nodes via raycast
+    const target = Engine.getRaycastTarget(5);
+    if (target && target.object.userData.type === 'clayNode') {
+      InteractPrompt.show('E', '采集黏土');
+      return;
+    }
+
+    // Check assistants
+    const assistants = ClaySystem.getAssistants();
+    for (const a of assistants) {
+      const dist = cameraPos.distanceTo(a.position);
+      if (dist < 4) {
+        InteractPrompt.show('E', `查看 ${a.userData.template.name}`);
+        return;
+      }
+    }
+
+    InteractPrompt.hide();
   }
 
   function renderQuestPanel() {
