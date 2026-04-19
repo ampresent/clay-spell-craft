@@ -56,6 +56,7 @@
     AudioSystem.init();
     Tooltip.init();
     Minimap.init();
+    Compass.init();
     InteractPrompt.init();
     ScreenFX.init();
     UI.init();
@@ -170,6 +171,12 @@
         const camera = Engine.getCamera();
         const clayNodes = World.getInteractables().filter(o => o.userData.type === 'clayNode');
         Minimap.render(camera.position, Characters.getNPCs(), ClaySystem.getAssistants(), clayNodes);
+
+        // Update compass
+        Compass.render();
+
+        // Update quest tracker
+        updateQuestTracker();
 
         // Update interact prompt
         updateInteractPrompt(camera.position);
@@ -368,6 +375,32 @@
     } else {
       panel.style.display = 'none';
     }
+  }
+
+  let trackerUpdateTimer = 0;
+
+  function updateQuestTracker() {
+    trackerUpdateTimer++;
+    if (trackerUpdateTimer % 30 !== 0) return; // Update every ~30 frames
+
+    const container = document.getElementById('tracker-content');
+    if (!container) return;
+
+    const activeQuests = QuestSystem.getActiveQuests();
+    if (activeQuests.length === 0) {
+      container.innerHTML = '<div style="color:#4a3a2a;font-size:0.68rem;">暂无进行中的任务</div>';
+      return;
+    }
+
+    container.innerHTML = activeQuests.slice(0, 2).map(q => {
+      const objs = q.objectives.filter(o => !o.done).slice(0, 3).map(o =>
+        `<div class="tracker-obj">○ ${o.text}</div>`
+      ).join('');
+      return `<div class="tracker-item">
+        <div class="tracker-title">${q.title}</div>
+        ${objs}
+      </div>`;
+    }).join('');
   }
 
   function updateInteractPrompt(cameraPos) {

@@ -30,6 +30,9 @@
         <span id="player-name">塑灵师</span>
         <span id="time-display" style="margin-left:12px;color:#6a5a4a;font-size:0.78rem;font-weight:400;"></span>
       </div>
+      <div id="compass">
+        <canvas id="compass-canvas" width="200" height="30"></canvas>
+      </div>
       <div id="mana-bar">
         <span class="icon">✨</span>
         <div class="bar"><div class="bar-fill" id="mana-fill"></div></div>
@@ -96,6 +99,11 @@
       <canvas id="minimap-canvas" width="150" height="150"></canvas>
     </div>
 
+    <div id="quest-tracker">
+      <h3>📋 进行中</h3>
+      <div id="tracker-content"></div>
+    </div>
+
     <div id="quest-panel" style="display:none;">
       <h2>📜 任务日志</h2>
       <div id="quest-list"></div>
@@ -153,6 +161,7 @@
   <script src="js/save.js"></script>
   <script src="js/tooltip.js"></script>
   <script src="js/minimap.js"></script>
+  <script src="js/compass.js"></script>
   <script src="js/notify.js"></script>
   <script src="js/interact-prompt.js"></script>
   <script src="js/screenfx.js"></script>
