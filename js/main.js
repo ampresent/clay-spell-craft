@@ -45,6 +45,7 @@
     World.init(scene);
     Structures.init(scene);
     Water.init(scene);
+    Underwater.init(scene);
     Effects.init(scene);
     Landmarks.init(scene);
     Collectibles.init(scene);
@@ -54,6 +55,7 @@
     SpellSystem.init(scene);
     Characters.init(scene);
     Enemies.init(scene);
+    Patrol.init();
     Bosses.init(scene);
     Trail.init(scene);
     Pets.init(scene);
@@ -184,6 +186,7 @@
         Engine.update(delta);
         World.update(gameTime);
         Water.update(gameTime);
+        Underwater.update(gameTime);
         Effects.update(gameTime);
         Landmarks.update(gameTime);
         Collectibles.update(gameTime);
@@ -192,6 +195,7 @@
         SpellSystem.update(delta);
         ClaySystem.update(gameTime, delta);
         Characters.update(gameTime);
+        Patrol.update(delta, Characters.getNPCs());
         Enemies.update(delta, gameTime, Engine.getCamera().position);
         Bosses.update(gameTime, delta, Engine.getCamera().position);
         Pets.update(gameTime, delta);
