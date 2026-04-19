@@ -57,5 +57,6 @@ const Inventory = (() => {
     });
   }
 
-  return { add, get, has, consume, getAll, render };
+  function setAll(data) { Object.assign(items, data); }
+  return { add, get, has, consume, getAll, setAll, render };
 })();

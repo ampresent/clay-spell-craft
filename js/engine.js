@@ -96,15 +96,27 @@ const Engine = (() => {
     if (isLocked) emit('click');
   }
 
-  function update(delta) {
-    if (!isLocked) return;
+  // Mobile look support
+  function _applyLook(dx, dy) {
+    yaw -= dx;
+    pitch -= dy;
+    pitch = Math.max(-Math.PI / 2.2, Math.min(Math.PI / 2.2, pitch));
+  }
 
-    // Movement
+  function update(delta) {
+    if (!isLocked && !MobileControls.isEnabled()) return;
+
+    // Movement (keyboard + mobile)
+    const fwd = moveForward || (typeof Engine._mobileForward !== 'undefined' && Engine._mobileForward);
+    const bwd = moveBackward || (typeof Engine._mobileBackward !== 'undefined' && Engine._mobileBackward);
+    const lft = moveLeft || (typeof Engine._mobileLeft !== 'undefined' && Engine._mobileLeft);
+    const rgt = moveRight || (typeof Engine._mobileRight !== 'undefined' && Engine._mobileRight);
+
     velocity.x -= velocity.x * 10.0 * delta;
     velocity.z -= velocity.z * 10.0 * delta;
 
-    direction.z = Number(moveForward) - Number(moveBackward);
-    direction.x = Number(moveRight) - Number(moveLeft);
+    direction.z = Number(fwd) - Number(bwd);
+    direction.x = Number(rgt) - Number(lft);
     direction.normalize();
 
     if (moveForward || moveBackward) velocity.z -= direction.z * MOVE_SPEED * delta;
@@ -119,6 +131,10 @@ const Engine = (() => {
     // Ground clamp
     const groundY = World.getGroundHeight(camera.position.x, camera.position.z);
     camera.position.y = groundY + 2;
+
+    // World boundary clamp
+    camera.position.x = Math.max(-WORLD_BOUNDS, Math.min(WORLD_BOUNDS, camera.position.x));
+    camera.position.z = Math.max(-WORLD_BOUNDS, Math.min(WORLD_BOUNDS, camera.position.z));
 
     // Camera rotation
     camera.rotation.order = 'YXZ';
@@ -142,12 +158,16 @@ const Engine = (() => {
     return dir;
   }
 
-  function getRaycastTarget(maxDist = 15) {
+  const WORLD_BOUNDS = 48; // terrain is 100, keep player inside
+
+  function getRaycastTarget(maxDist = 15, targets) {
     const origin = camera.position.clone();
     const dir = getCameraForward();
     const raycaster = new THREE.Raycaster(origin, dir, 0, maxDist);
     raycaster.camera = camera;
-    const intersects = raycaster.intersectObjects(scene.children, true);
+    // Use provided target list, or fall back to scene.children
+    const objects = targets || scene.children;
+    const intersects = raycaster.intersectObjects(objects, true);
     return intersects.length > 0 ? intersects[0] : null;
   }
 
@@ -160,5 +180,7 @@ const Engine = (() => {
     getCameraForward,
     getRaycastTarget,
     isLocked: () => isLocked,
+    _applyLook,
+    WORLD_BOUNDS,
   };
 })();

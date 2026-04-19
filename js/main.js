@@ -20,21 +20,25 @@
       '新的塑灵师即将踏入这片神奇的土地……',
     ];
 
-    // Simulate loading
-    for (let i = 0; i <= 100; i += 4) {
-      UI.showLoading(i);
+    // Real loading with story progression
+    const totalSteps = 25;
+    for (let step = 0; step <= totalSteps; step++) {
+      const pct = Math.round((step / totalSteps) * 100);
+      UI.showLoading(pct);
       const storyEl = document.getElementById('loading-story');
       if (storyEl) {
-        const storyIdx = Math.floor((i / 100) * stories.length);
-        if (storyIdx < stories.length && storyEl.textContent !== stories[storyIdx]) {
+        const storyIdx = Math.min(Math.floor((step / totalSteps) * stories.length), stories.length - 1);
+        if (storyEl.dataset.idx !== String(storyIdx)) {
           storyEl.style.opacity = '0';
+          storyEl.dataset.idx = storyIdx;
           setTimeout(() => {
             storyEl.textContent = stories[storyIdx];
             storyEl.style.opacity = '1';
-          }, 200);
+          }, 150);
         }
       }
-      await sleep(35);
+      // Yield to browser for actual rendering
+      await new Promise(r => requestAnimationFrame(r));
     }
 
     // Init engine
@@ -78,6 +82,7 @@
     Compass.init();
     WorldMap.init();
     InteractPrompt.init();
+    MobileControls.init();
     ScreenFX.init();
     QuestAnim.init(scene);
     UI.init();
@@ -214,7 +219,7 @@
 
         // Stats tracking
         Stats.update(delta, cameraPos);
-        const isMoving = Engine.isLocked() && (Math.abs(Engine.getCamera().position.x - (window._lastPX || 0)) > 0.01 || Math.abs(Engine.getCamera().position.z - (window._lastPZ || 0)) > 0.01);
+        const isMoving = (Engine.isLocked() || MobileControls.isEnabled()) && (Math.abs(Engine.getCamera().position.x - (window._lastPX || 0)) > 0.01 || Math.abs(Engine.getCamera().position.z - (window._lastPZ || 0)) > 0.01);
         Trail.update(delta, cameraPos, isMoving);
         window._lastPX = cameraPos.x;
         window._lastPZ = cameraPos.z;
@@ -261,10 +266,11 @@
     ParticlesBg.stop();
     UI.hideTitle();
     UI.showHUD();
+    MobileControls.show();
     Achievements.complete('first_steps');
 
     const canvas = document.getElementById('game-canvas');
-    Engine.lockPointer(canvas);
+    if (!MobileControls.isEnabled()) Engine.lockPointer(canvas);
 
     // Start audio
     AudioSystem.resume();
@@ -291,20 +297,28 @@
     startGame();
 
     // Restore player position
+    const camera = Engine.getCamera();
     if (saveData.player) {
-      const camera = Engine.getCamera();
       camera.position.set(
         saveData.player.position.x,
         saveData.player.position.y,
         saveData.player.position.z
       );
+    } else if (saveData.position) {
+      // Legacy save format
+      camera.position.set(saveData.position.x, saveData.position.y, saveData.position.z);
     }
 
     // Restore clay
-    if (saveData.clay) {
-      // Directly set the amount (addClay adds, so we need to hack it)
-      // We'll just add what was saved
+    if (saveData.clayAmount) {
+      ClaySystem.addClay(saveData.clayAmount);
+    } else if (saveData.clay) {
       ClaySystem.addClay(saveData.clay);
+    }
+
+    // Restore inventory (v2 saves)
+    if (saveData.inventory && typeof Inventory.setAll === 'function') {
+      Inventory.setAll(saveData.inventory);
     }
 
     UI.notify('📂 存档已读取');
@@ -314,9 +328,17 @@
   function doSave() {
     const camera = Engine.getCamera();
     const state = {
-      position: { x: camera.position.x, y: camera.position.y, z: camera.position.z },
-      rotation: { y: camera.rotation.y, x: camera.rotation.x },
+      version: 2,
+      timestamp: Date.now(),
+      player: {
+        position: { x: camera.position.x, y: camera.position.y, z: camera.position.z },
+        rotation: { y: camera.rotation.y, x: camera.rotation.x },
+        level: Player.getLevel(),
+        hp: Player.getHP(),
+        maxHP: Player.getMaxHP(),
+      },
       clayAmount: ClaySystem.getClayAmount(),
+      inventory: typeof Inventory.getAll === 'function' ? Inventory.getAll() : {},
       quests: QuestSystem.getAllQuests().map(q => ({
         id: q.id, status: q.status,
         objectives: q.objectives.map(o => ({ id: o.id, done: o.done })),
@@ -325,6 +347,7 @@
         type: a.userData.assistantType,
         position: { x: a.position.x, y: a.position.y, z: a.position.z },
       })),
+      achievements: typeof Achievements.getUnlocked === 'function' ? Achievements.getUnlocked() : [],
     };
 
     if (SaveSystem.save(state)) {
@@ -585,36 +608,45 @@
   }
 
   function updateInteractPrompt(cameraPos) {
-    // Check NPCs
+    // Check NPCs (distance only, no raycast needed)
     const npcs = Characters.getNPCs();
     for (const npc of npcs) {
-      const dist = cameraPos.distanceTo(npc.position);
-      if (dist < 4) {
+      if (cameraPos.distanceTo(npc.position) < 4) {
         InteractPrompt.show('E', `与 ${npc.userData.data.name} 交谈`);
         return;
       }
     }
 
-    // Check clay nodes and collectibles via raycast
-    const target = Engine.getRaycastTarget(5);
-    if (target) {
-      if (target.object.userData.type === 'clayNode') {
-        InteractPrompt.show('E', '采集黏土');
-        return;
-      }
-      if (target.object.userData.type === 'collectible') {
-        InteractPrompt.show('E', `拾取 ${target.object.userData.itemType.name}`);
+    // Check assistants (distance only)
+    const assistants = ClaySystem.getAssistants();
+    for (const a of assistants) {
+      if (cameraPos.distanceTo(a.position) < 4) {
+        InteractPrompt.show('E', `查看 ${a.userData.template.name}`);
         return;
       }
     }
 
-    // Check assistants
-    const assistants = ClaySystem.getAssistants();
-    for (const a of assistants) {
-      const dist = cameraPos.distanceTo(a.position);
-      if (dist < 4) {
-        InteractPrompt.show('E', `查看 ${a.userData.template.name}`);
-        return;
+    // Check interactables via raycast (only nearby objects)
+    const allTargets = [
+      ...World.getInteractables(),
+      ...Collectibles.getItems(),
+    ];
+    const nearby = allTargets.filter(o => o.visible !== false && cameraPos.distanceTo(o.position) < 6);
+    if (nearby.length > 0) {
+      const target = Engine.getRaycastTarget(5, nearby);
+      if (target) {
+        if (target.object.userData.type === 'clayNode') {
+          InteractPrompt.show('E', '采集黏土');
+          return;
+        }
+        if (target.object.userData.type === 'collectible') {
+          InteractPrompt.show('E', `拾取 ${target.object.userData.itemType.name}`);
+          return;
+        }
+        if (target.object.userData.type === 'secret') {
+          InteractPrompt.show('E', '发现秘密');
+          return;
+        }
       }
     }
 
