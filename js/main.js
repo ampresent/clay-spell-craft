@@ -79,6 +79,7 @@
     Settings.init();
     Music.init();
     Tooltip.init();
+    Books.init();
     Minimap.init();
     Compass.init();
     WorldMap.init();
@@ -427,6 +428,14 @@
 
       if (target.object.userData.type === 'secret') {
         Secrets.discover(target.object.userData.secretId);
+        return;
+      }
+      if (target.object.userData.type === 'book') {
+        const bookId = target.object.userData.bookId;
+        Books.collect(bookId);
+        Books.read(bookId);
+        Engine.getScene().remove(target.object);
+        World.removeInteractable(target.object);
         return;
       }
     }

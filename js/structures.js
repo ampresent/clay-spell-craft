@@ -25,6 +25,7 @@ const Structures = (() => {
     createFences();
     await createTreesFromModels();
     await createEnvironmentModels();
+    await spawnBooks();
     createMushrooms(); // fallback procedural mushrooms as accent
   }
 
@@ -267,6 +268,63 @@ const Structures = (() => {
       const cap = new THREE.Mesh(new THREE.SphereGeometry(size * 0.7, 8, 6, 0, Math.PI * 2, 0, Math.PI / 2),
         new THREE.MeshStandardMaterial({ color, emissive: color, emissiveIntensity: 0.2, roughness: 0.5 }));
       cap.position.set(x, y + size, z); scene.add(cap);
+    }
+  }
+
+
+  // Spawning in-world book items (insert before return)
+  async function spawnBooks() {
+    const bookLocations = [
+      { id: 'creation_vol1', x: -1, z: -2, label: '泥灵创世录·卷一' },
+      { id: 'creation_vol2', x: 1, z: -2, label: '泥灵创世录·卷二' },
+      { id: 'elemental_guide', x: -6.5, z: 7, label: '四元素入门指南' },
+      { id: 'traveler_tales', x: 8.5, z: 5, label: '旅行者见闻录' },
+      { id: 'war_chronicle', x: -22, z: -18, label: '黏土战争编年史' },
+      { id: 'scholar_notes', x: -5.5, z: 8.5, label: '瓷小姐的研究笔记' },
+      { id: 'titan_whispers', x: -20, z: -16, label: '巨人的低语' },
+      { id: 'elder_diary', x: -0.5, z: -5, label: '泥爷爷的日记' },
+    ];
+
+    for (const b of bookLocations) {
+      const y = World.getGroundHeight(b.x, b.z);
+      const group = new THREE.Group();
+
+      // Book mesh (flat box)
+      const bookGeo = new THREE.BoxGeometry(0.3, 0.4, 0.05);
+      const bookMat = new THREE.MeshStandardMaterial({
+        color: 0x8a4a2a, roughness: 0.85, flatShading: true,
+      });
+      const book = new THREE.Mesh(bookGeo, bookMat);
+      book.rotation.x = -0.3;
+      book.castShadow = true;
+      group.add(book);
+
+      // Glow
+      const glowGeo = new THREE.SphereGeometry(0.2, 8, 8);
+      const glowMat = new THREE.MeshStandardMaterial({
+        color: 0xe8c87a, emissive: 0xe8c87a, emissiveIntensity: 0.3,
+        transparent: true, opacity: 0.15,
+      });
+      const glow = new THREE.Mesh(glowGeo, glowMat);
+      group.add(glow);
+
+      // Floating text label
+      const labelCanvas = document.createElement('canvas');
+      labelCanvas.width = 256; labelCanvas.height = 48;
+      const ctx = labelCanvas.getContext('2d');
+      ctx.font = 'bold 18px sans-serif'; ctx.fillStyle = '#e8c87a'; ctx.textAlign = 'center';
+      ctx.fillText('\uD83D\uDCD6 ' + b.label, 128, 32);
+      const labelTex = new THREE.CanvasTexture(labelCanvas);
+      const label = new THREE.Sprite(new THREE.SpriteMaterial({ map: labelTex, transparent: true }));
+      label.position.y = 0.8; label.scale.set(1.5, 0.3, 1);
+      group.add(label);
+
+      group.position.set(b.x, y + 0.5, b.z);
+      group.userData.type = 'book';
+      group.userData.bookId = b.id;
+      group.userData.interactable = true;
+
+      scene.add(group);
     }
   }
 
