@@ -1,0 +1,57 @@
+{
+  "description": "Example action payloads for clay-spell-craft Playwright testing",
+  "notes": {
+    "steps": "Array of frame-by-frame actions",
+    "buttons": "Keyboard buttons to hold during frames (left_mouse_button, space, left, right, up, down)",
+    "mouse_x/y": "Virtual mouse position (0-1 mapped to canvas bounds)",
+    "frames": "Number of advanceTime(16.67ms) calls to run with this input"
+  },
+  "examples": {
+    "idle_wait": {
+      "steps": [
+        { "buttons": [], "frames": 60 }
+      ]
+    },
+    "move_right": {
+      "steps": [
+        { "buttons": ["right"], "frames": 30 },
+        { "buttons": [], "frames": 10 }
+      ]
+    },
+    "move_forward": {
+      "steps": [
+        { "buttons": ["up"], "frames": 30 },
+        { "buttons": [], "frames": 10 }
+      ]
+    },
+    "attack": {
+      "steps": [
+        { "buttons": ["left_mouse_button"], "frames": 2 },
+        { "buttons": [], "frames": 10 }
+      ]
+    },
+    "move_and_attack": {
+      "steps": [
+        { "buttons": ["up"], "frames": 20 },
+        { "buttons": ["left_mouse_button"], "frames": 2 },
+        { "buttons": [], "frames": 15 }
+      ]
+    },
+    "cast_fire_spell": {
+      "steps": [
+        { "buttons": ["digit2"], "frames": 5 },
+        { "buttons": ["left_mouse_button"], "frames": 2 },
+        { "buttons": [], "frames": 10 }
+      ]
+    },
+    "interact_with_npc": {
+      "steps": [
+        { "buttons": ["up"], "frames": 40 },
+        { "buttons": ["e"], "frames": 2 },
+        { "buttons": [], "frames": 10 },
+        { "buttons": ["space"], "frames": 2 },
+        { "buttons": [], "frames": 10 }
+      ]
+    }
+  }
+}

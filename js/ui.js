@@ -148,7 +148,7 @@ const UI = (() => {
         // Recipe unlock handled elsewhere
         break;
       case 'open_shop':
-        // Shop available via F key
+        // Shop available via G key
         break;
       case 'open_library':
         Books.renderLibrary();

@@ -144,6 +144,11 @@
     });
 
     Engine.on('escape', () => {
+      // Exit fullscreen first if active
+      if (document.fullscreenElement) {
+        document.exitFullscreen().catch(() => {});
+        return;
+      }
       if (UI.isCraftOpen()) { UI.closeCraft(); return; }
       if (UI.isDialogActive()) { UI.closeDialog(); return; }
       // Close any open panel
@@ -173,8 +178,10 @@
         toggleRecipesPanel();
       } else if (e.code === 'KeyU') {
         toggleAchievementsPanel();
-      } else if (e.code === 'KeyF') {
+      } else if (e.code === 'KeyG') {
         if (Shop.isOpen()) Shop.close(); else Shop.open();
+      } else if (e.code === 'KeyF') {
+        toggleFullscreen();
       } else if (e.code === 'KeyM') {
         WorldMap.toggle();
       } else if (e.code === 'KeyV') {
@@ -184,6 +191,121 @@
       } else if (e.code === 'F5') {
         e.preventDefault();
         doSave();
+      }
+    });
+
+    // === Testing & Automation Hooks (develop-web-game skill) ===
+    // Deterministic time stepping: window.advanceTime(ms)
+    window.advanceTime = function(ms) {
+      const dt = Math.max(0, ms) / 1000;
+      gameTime += dt;
+      if (gameStarted) {
+        Engine.update(dt);
+        World.update(gameTime);
+        Water.update(gameTime);
+        Underwater.update(gameTime);
+        Effects.update(gameTime);
+        Ambients.update(gameTime);
+        Landmarks.update(gameTime);
+        Collectibles.update(gameTime);
+        Dungeons.update(gameTime);
+        Secrets.update(gameTime);
+        SpellSystem.update(dt);
+        ClaySystem.update(gameTime, dt);
+        Characters.update(gameTime);
+        Patrol.update(dt, Characters.getNPCs());
+        Enemies.update(dt, gameTime, Engine.getCamera().position);
+        Bosses.update(gameTime, dt, Engine.getCamera().position);
+        Pets.update(gameTime, dt);
+        DayNight.update(dt);
+        Waystones.update(gameTime);
+        Weather.update(dt, gameTime);
+        NightEvents.update(gameTime);
+        const cameraPos = Engine.getCamera().position;
+        Zones.update(cameraPos);
+        Stats.update(dt, cameraPos);
+        ScreenFX.update();
+        QuestAnim.update(dt);
+      }
+      Engine.getRenderer().render(Engine.getScene(), Engine.getCamera());
+    };
+
+    // Game state reader for test scripts
+    window.render_game_to_text = function() {
+      const camera = Engine.getCamera();
+      const camPos = camera ? camera.position : { x: 0, y: 0, z: 0 };
+      const zone = Zones.getCurrentZone();
+      const payload = {
+        mode: gameStarted ? 'playing' : 'title',
+        gameTime: Math.round(gameTime * 100) / 100,
+        player: {
+          x: Math.round(camPos.x * 100) / 100,
+          y: Math.round(camPos.y * 100) / 100,
+          z: Math.round(camPos.z * 100) / 100,
+          level: Player.getLevel(),
+          hp: Player.getHP(),
+          maxHP: Player.getMaxHP(),
+          attack: Player.getAttack(),
+        },
+        clay: ClaySystem.getClayAmount(),
+        assistants: ClaySystem.getAssistants().map(a => ({
+          type: a.userData.assistantType,
+          x: Math.round(a.position.x * 100) / 100,
+          z: Math.round(a.position.z * 100) / 100,
+        })),
+        enemies: Enemies.getEnemies()
+          .filter(e => e.userData.alive)
+          .map(e => ({
+            type: e.userData.typeId,
+            x: Math.round(e.position.x * 100) / 100,
+            z: Math.round(e.position.z * 100) / 100,
+            hp: e.userData.hp,
+          })),
+        npcs: Characters.getNPCs().map(n => ({
+          key: n.userData.npcKey,
+          x: Math.round(n.position.x * 100) / 100,
+          z: Math.round(n.position.z * 100) / 100,
+        })),
+        zone: zone ? { id: zone.id, name: zone.name } : null,
+        quests: QuestSystem.getActiveQuests().map(q => ({
+          id: q.id,
+          title: q.title,
+          objectives: q.objectives.filter(o => !o.done).map(o => o.text),
+        })),
+        tool: typeof SpellSystem.getCurrentSpell === 'function' ? SpellSystem.getCurrentSpell() : 'sculpt',
+      };
+      return JSON.stringify(payload);
+    };
+
+    // Time control for testing
+    window.getGameTime = function() { return gameTime; };
+    window.setGameTime = function(t) { gameTime = t; };
+    window.isGameStarted = function() { return gameStarted; };
+
+    // Fullscreen toggle (skill: F key)
+    let isFullscreen = false;
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().then(() => {
+          isFullscreen = true;
+        }).catch(() => {});
+      } else {
+        document.exitFullscreen().then(() => {
+          isFullscreen = false;
+        }).catch(() => {});
+      }
+    }
+    // Resize canvas on fullscreen change
+    document.addEventListener('fullscreenchange', () => {
+      isFullscreen = !!document.fullscreenElement;
+      if (Engine.getCamera && Engine.getRenderer) {
+        const cam = Engine.getCamera();
+        const ren = Engine.getRenderer();
+        if (cam && ren) {
+          cam.aspect = window.innerWidth / window.innerHeight;
+          cam.updateProjectionMatrix();
+          ren.setSize(window.innerWidth, window.innerHeight);
+        }
       }
     });
 

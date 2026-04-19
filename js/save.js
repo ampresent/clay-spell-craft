@@ -7,16 +7,17 @@ const SaveSystem = (() => {
   function save(gameState) {
     try {
       const data = {
-        version: 1,
+        version: 2,
         timestamp: Date.now(),
-        player: {
+        player: gameState.player || {
           position: gameState.position,
           rotation: gameState.rotation,
         },
-        clay: gameState.clayAmount,
-        quests: gameState.quests,
-        assistants: gameState.assistants,
-        harvestedNodes: gameState.harvestedNodes,
+        clayAmount: gameState.clayAmount || gameState.clay || 0,
+        inventory: gameState.inventory || {},
+        quests: gameState.quests || [],
+        assistants: gameState.assistants || [],
+        achievements: gameState.achievements || [],
       };
       localStorage.setItem(SAVE_KEY, JSON.stringify(data));
       return true;
@@ -50,7 +51,7 @@ const SaveSystem = (() => {
     if (!data) return null;
     return {
       timestamp: data.timestamp,
-      clay: data.clay,
+      clay: data.clayAmount || data.clay,
       date: new Date(data.timestamp).toLocaleString('zh-CN'),
     };
   }

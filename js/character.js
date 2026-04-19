@@ -199,7 +199,7 @@ const Characters = (() => {
         },
         {
           id: 'shop_offer',
-          text: '对了，我这里有些好东西，要不要看看？按 F 打开商店！',
+          text: '对了，我这里有些好东西，要不要看看？按 G 打开商店！',
           next: 'personal_intro',
           action: 'open_shop',
         },

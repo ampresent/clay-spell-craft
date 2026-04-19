@@ -1,0 +1,13 @@
+{
+  "name": "clay-spell-craft",
+  "version": "1.0.0",
+  "description": "泥灵界 (Clayrealm) — WebGL magic world game",
+  "private": true,
+  "scripts": {
+    "test": "node scripts/test.js",
+    "serve": "python3 -m http.server 5173"
+  },
+  "devDependencies": {
+    "playwright": "^1.40.0"
+  }
+}

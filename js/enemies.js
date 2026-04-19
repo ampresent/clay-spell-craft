@@ -303,6 +303,7 @@ const Enemies = (() => {
       // Attack player
       if (distToPlayer < 1.5 && ud.attackCooldown <= 0) {
         ud.attackCooldown = 1.5;
+        Player.takeDamage(template.damage);
         ScreenFX.damageFlash();
         Notify.warning(`${template.emoji} ${template.name} 攻击了你！`);
       }
