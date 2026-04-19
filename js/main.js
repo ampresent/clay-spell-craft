@@ -23,11 +23,13 @@
     // Init systems
     const scene = Engine.getScene();
     World.init(scene);
+    Structures.init(scene);
     ClaySystem.init(scene);
     SpellSystem.init(scene);
     Characters.init(scene);
     QuestSystem.init();
     DayNight.init(scene);
+    AudioSystem.init();
     UI.init();
 
     // Hide loading, show title
@@ -122,11 +124,16 @@
     const canvas = document.getElementById('game-canvas');
     Engine.lockPointer(canvas);
 
+    // Start audio
+    AudioSystem.resume();
+    AudioSystem.startAmbient();
+
     // Initial dialog
     setTimeout(() => {
       UI.showDialog('🌍', '泥灵界',
         '你踏入了泥灵界。远处有一位老人正在捏着什么……也许该去打个招呼。\n\n提示：按 Q 查看任务日志'
       );
+      AudioSystem.playSFX('dialog');
     }, 1500);
   }
 
@@ -142,10 +149,12 @@
       if (dist < 4) {
         const data = npc.userData.data;
         UI.showNPCDialog(data, 'greeting');
+        AudioSystem.playSFX('dialog');
 
         // Quest completion
         if (npc.userData.npcKey === 'elder') {
           QuestSystem.completeObjective('first_steps', 'talk_elder');
+          AudioSystem.playSFX('quest');
         } else if (npc.userData.npcKey === 'scholar') {
           QuestSystem.completeObjective('meet_scholar', 'talk_scholar');
         }
@@ -160,6 +169,9 @@
       const amount = Math.min(node.userData.amount, 10);
       ClaySystem.addClay(amount);
       node.userData.amount -= amount;
+
+      // SFX
+      AudioSystem.playSFX('harvest');
 
       // Visual feedback
       SpellSystem.castAt(target.point);
@@ -202,6 +214,8 @@
       const pos = camera.position.clone().add(Engine.getCameraForward().multiplyScalar(8));
       SpellSystem.castAt(pos);
     }
+
+    AudioSystem.playSFX('spell');
 
     // Quest completion
     QuestSystem.completeObjective('first_steps', 'cast_spell');
