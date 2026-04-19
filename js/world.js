@@ -4,8 +4,8 @@
 const World = (() => {
   let scene;
   let groundMesh;
-  const TERRAIN_SIZE = 100;
-  const TERRAIN_SEGMENTS = 80;
+  const TERRAIN_SIZE = 300;
+  const TERRAIN_SEGMENTS = 200;
   const interactables = [];
 
   function init(_scene) {
@@ -34,10 +34,10 @@ const World = (() => {
     sun.shadow.mapSize.height = 2048;
     sun.shadow.camera.near = 1;
     sun.shadow.camera.far = 120;
-    sun.shadow.camera.left = -50;
-    sun.shadow.camera.right = 50;
-    sun.shadow.camera.top = 50;
-    sun.shadow.camera.bottom = -50;
+    sun.shadow.camera.left = -150;
+    sun.shadow.camera.right = 150;
+    sun.shadow.camera.top = 150;
+    sun.shadow.camera.bottom = -150;
     scene.add(sun);
 
     // Magical point lights
@@ -203,8 +203,8 @@ const World = (() => {
     // Glowing crystals scattered around
     const crystalColors = [0xff4466, 0x44aaff, 0x44ff88, 0xffaa44, 0xaa44ff];
     for (let i = 0; i < 20; i++) {
-      const x = (Math.random() - 0.5) * 60;
-      const z = (Math.random() - 0.5) * 60;
+      const x = (Math.random() - 0.5) * 200;
+      const z = (Math.random() - 0.5) * 200;
       if (Math.sqrt(x * x + z * z) < 8) continue;
 
       const color = crystalColors[Math.floor(Math.random() * crystalColors.length)];

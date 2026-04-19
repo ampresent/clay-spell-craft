@@ -20,7 +20,7 @@ const Engine = (() => {
     scene.fog = new THREE.FogExp2(0x1a1028, 0.015);
 
     // Camera
-    camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 500);
+    camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 800);
     camera.position.set(0, 2, 10);
 
     // Renderer
@@ -158,7 +158,7 @@ const Engine = (() => {
     return dir;
   }
 
-  const WORLD_BOUNDS = 48; // terrain is 100, keep player inside
+  const WORLD_BOUNDS = 148; // terrain is 100, keep player inside
 
   function getRaycastTarget(maxDist = 15, targets) {
     const origin = camera.position.clone();

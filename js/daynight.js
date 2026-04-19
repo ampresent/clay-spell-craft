@@ -21,8 +21,8 @@ const DayNight = (() => {
     const sunAngle = timeOfDay * Math.PI * 2 - Math.PI / 2;
     if (sun) {
       sun.position.set(
-        Math.cos(sunAngle) * 50,
-        Math.sin(sunAngle) * 50 + 10,
+        Math.cos(sunAngle) * 150,
+        Math.sin(sunAngle) * 150 + 10,
         20
       );
 

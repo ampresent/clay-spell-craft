@@ -164,6 +164,12 @@ const Structures = (() => {
       [-6, -18], [10, 14], [-16, -14], [22, 4], [-11, 20],
       [-25, -15], [25, 12], [-20, 22], [14, -22], [-28, 5],
       [8, 25], [-12, -25], [22, -8], [-8, -22], [16, -16],
+      [-35, -20], [30, 25], [-28, 35], [35, -10], [-40, 15],
+      [25, -30], [-15, -35], [40, 20], [-30, -35], [35, 35],
+      [-45, -25], [45, 10], [-35, 40], [20, -40], [-50, -10],
+      [50, -20], [-20, 50], [40, -35], [-40, 40], [10, -50],
+      [-55, 15], [55, -15], [-30, -50], [30, 50], [-60, 30],
+      [60, -30], [-45, 55], [45, -55], [50, 50], [-50, -50],
     ];
 
     for (let i = 0; i < treePositions.length; i++) {
@@ -176,10 +182,10 @@ const Structures = (() => {
 
   async function createEnvironmentModels() {
     // Flowers scattered around
-    const flowerCount = 40;
+    const flowerCount = 80;
     for (let i = 0; i < flowerCount; i++) {
       const angle = Math.random() * Math.PI * 2;
-      const dist = 6 + Math.random() * 30;
+      const dist = 6 + Math.random() * 80;
       const x = Math.cos(angle) * dist;
       const z = Math.sin(angle) * dist;
       if (Math.sqrt(x*x + z*z) < 5) continue;
@@ -188,20 +194,20 @@ const Structures = (() => {
     }
 
     // Grass tufts
-    const grassCount = 50;
+    const grassCount = 120;
     for (let i = 0; i < grassCount; i++) {
-      const x = (Math.random() - 0.5) * 60;
-      const z = (Math.random() - 0.5) * 60;
+      const x = (Math.random() - 0.5) * 180;
+      const z = (Math.random() - 0.5) * 180;
       if (Math.sqrt(x*x + z*z) < 4) continue;
       const model = GRASS_MODELS[i % GRASS_MODELS.length];
       await placeModel(model, x, z, 0.5 + Math.random() * 0.5, 0);
     }
 
     // Rocks
-    const rockCount = 20;
+    const rockCount = 50;
     for (let i = 0; i < rockCount; i++) {
       const angle = Math.random() * Math.PI * 2;
-      const dist = 8 + Math.random() * 35;
+      const dist = 8 + Math.random() * 90;
       const x = Math.cos(angle) * dist;
       const z = Math.sin(angle) * dist;
       const model = ROCK_MODELS[i % ROCK_MODELS.length];
@@ -209,10 +215,10 @@ const Structures = (() => {
     }
 
     // Bushes
-    const bushCount = 25;
+    const bushCount = 60;
     for (let i = 0; i < bushCount; i++) {
       const angle = Math.random() * Math.PI * 2;
-      const dist = 7 + Math.random() * 28;
+      const dist = 7 + Math.random() * 80;
       const x = Math.cos(angle) * dist;
       const z = Math.sin(angle) * dist;
       const model = BUSH_MODELS[i % BUSH_MODELS.length];
@@ -222,7 +228,7 @@ const Structures = (() => {
     // Stumps (less common)
     for (let i = 0; i < 8; i++) {
       const angle = Math.random() * Math.PI * 2;
-      const dist = 10 + Math.random() * 25;
+      const dist = 10 + Math.random() * 70;
       const x = Math.cos(angle) * dist;
       const z = Math.sin(angle) * dist;
       const model = STUMP_MODELS[i % STUMP_MODELS.length];
@@ -231,8 +237,8 @@ const Structures = (() => {
 
     // Scattered stones
     for (let i = 0; i < 15; i++) {
-      const x = (Math.random() - 0.5) * 55;
-      const z = (Math.random() - 0.5) * 55;
+      const x = (Math.random() - 0.5) * 160;
+      const z = (Math.random() - 0.5) * 160;
       const model = STONE_MODELS[i % STONE_MODELS.length];
       await placeModel(model, x, z, 0.5 + Math.random() * 1.0, 0);
     }
@@ -256,8 +262,8 @@ const Structures = (() => {
     // Keep some procedural glowing mushrooms as magical accent
     const colors = [0xff6688, 0x88aaff, 0xffaa44, 0xaa88ff, 0x44ffaa];
     for (let i = 0; i < 15; i++) {
-      const x = (Math.random() - 0.5) * 50;
-      const z = (Math.random() - 0.5) * 50;
+      const x = (Math.random() - 0.5) * 180;
+      const z = (Math.random() - 0.5) * 180;
       if (Math.sqrt(x * x + z * z) < 8) continue;
       const y = World.getGroundHeight(x, z);
       const color = colors[Math.floor(Math.random() * colors.length)];

@@ -83,6 +83,7 @@
     Minimap.init();
     Compass.init();
     WorldMap.init();
+    Waystones.init(scene);
     InteractPrompt.init();
     MobileControls.init();
     ScreenFX.init();
@@ -176,6 +177,8 @@
         if (Shop.isOpen()) Shop.close(); else Shop.open();
       } else if (e.code === 'KeyM') {
         WorldMap.toggle();
+      } else if (e.code === 'KeyV') {
+        Waystones.renderWaypointPanel();
       } else if (e.code === 'KeyT') {
         toggleStatsPanel();
       } else if (e.code === 'F5') {
@@ -210,6 +213,7 @@
         Bosses.update(gameTime, delta, Engine.getCamera().position);
         Pets.update(gameTime, delta);
         DayNight.update(delta);
+        Waystones.update(gameTime);
         Weather.update(delta, gameTime);
         NightEvents.update(gameTime);
 
@@ -454,6 +458,27 @@
         return;
       }
     }
+
+    // Waystones
+    const waystones = Waystones.getWaystones();
+    for (const ws of waystones) {
+      const dist = cameraPos.distanceTo(ws.position);
+      if (dist < 3) {
+        const data = ws.userData.data;
+        const wasNew = Waystones.discover(data.id);
+        if (wasNew) {
+          UI.showDialog(data.icon, data.name,
+            `${data.desc}\n\n传送点已激活！按 V 打开传送面板，或在世界地图(M)上选择已发现的传送点进行传送。`
+          );
+        } else {
+          UI.showDialog(data.icon, data.name,
+            `${data.desc}\n\n按 V 打开传送面板进行传送。`
+          );
+        }
+        AudioSystem.playSFX('dialog');
+        return;
+      }
+    }
   }
 
   function handleCastSpell() {
@@ -657,6 +682,16 @@
           InteractPrompt.show('E', '发现秘密');
           return;
         }
+      }
+    }
+
+    // Check waystones
+    const wss = Waystones.getWaystones();
+    for (const ws of wss) {
+      if (cameraPos.distanceTo(ws.position) < 3) {
+        const isFound = Waystones.isDiscovered(ws.userData.waystoneId);
+        InteractPrompt.show('E', isFound ? '使用传送点' : '激活传送点');
+        return;
       }
     }
 

@@ -4,8 +4,8 @@
 const WorldMap = (() => {
   let canvas, ctx;
   let visible = false;
-  const MAP_SIZE = 500;
-  const WORLD_SCALE = MAP_SIZE / 100; // world is ~100 units
+  const MAP_SIZE = 600;
+  const WORLD_SCALE = MAP_SIZE / 300; // world is ~100 units
 
   function init() {
     canvas = document.getElementById('worldmap-canvas');
@@ -48,13 +48,13 @@ const WorldMap = (() => {
 
     // Terrain dots (approximation)
     ctx.fillStyle = 'rgba(60,50,35,0.4)';
-    for (let x = -50; x < 50; x += 3) {
-      for (let z = -50; z < 50; z += 3) {
+    for (let x = -150; x < 150; x += 4) {
+      for (let z = -150; z < 150; z += 4) {
         const h2 = World.getGroundHeight(x, z);
         if (h2 > -1) {
           const mx = cx + x * WORLD_SCALE * 0.5;
           const my = cy + z * WORLD_SCALE * 0.5;
-          const brightness = Math.min(1, (h2 + 3) / 6);
+          const brightness = Math.min(1, (h2 + 3) / 8);
           ctx.fillStyle = `rgba(${60 + brightness * 40},${50 + brightness * 30},${35 + brightness * 20},0.5)`;
           ctx.fillRect(mx, my, 2, 2);
         }
@@ -147,7 +147,37 @@ const WorldMap = (() => {
     ctx.lineTo(px + dir.x * 12, py + dir.z * 12);
     ctx.stroke();
 
-    // Legend
+    // Waystones
+    const wsAll = Waystones.getAll();
+    wsAll.forEach(ws => {
+      const mx = cx + ws.x * WORLD_SCALE;
+      const my = cy + ws.z * WORLD_SCALE;
+      const found = Waystones.isDiscovered(ws.id);
+
+      if (found) {
+        // Star marker for discovered waystones
+        ctx.fillStyle = '#' + ws.color.toString(16).padStart(6, '0');
+        ctx.shadowColor = '#' + ws.color.toString(16).padStart(6, '0');
+        ctx.shadowBlur = 6;
+        ctx.font = '12px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('⭐', mx, my + 4);
+        ctx.shadowBlur = 0;
+
+        // Name label
+        ctx.fillStyle = '#8a7a6a';
+        ctx.font = '8px sans-serif';
+        ctx.fillText(ws.name.replace('传送石', ''), mx, my + 14);
+      } else {
+        // Unknown marker
+        ctx.fillStyle = '#333';
+        ctx.font = '10px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('❓', mx, my + 4);
+      }
+    });
+
+        // Legend
     ctx.fillStyle = '#6a5a4a';
     ctx.font = '10px sans-serif';
     ctx.textAlign = 'left';
