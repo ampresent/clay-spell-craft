@@ -121,6 +121,18 @@
       <div id="abilities-grid"></div>
       <button id="abil-close" onclick="document.getElementById('abilities-panel').style.display='none'">关闭</button>
     </div>
+
+    <div id="recipes-panel" style="display:none;">
+      <h2>📋 配方图鉴</h2>
+      <div id="recipe-list"></div>
+      <button id="recipe-close" onclick="document.getElementById('recipes-panel').style.display='none'">关闭</button>
+    </div>
+
+    <div id="achievements-panel" style="display:none;">
+      <h2>🏆 成就 <span id="ach-count" style="color:#6a5a4a;font-size:0.8rem;font-weight:400;"></span></h2>
+      <div id="achievements-grid"></div>
+      <button id="ach-close" onclick="document.getElementById('achievements-panel').style.display='none'">关闭</button>
+    </div>
   </div>
 
   <div id="title-screen">
@@ -136,7 +148,8 @@
       </div>
       <div class="title-footer">
         <span>WASD</span> 移动 · <span>鼠标</span> 视角 · <span>左键</span> 施法 · <span>E</span> 交互<br>
-        <span>Q</span> 任务 · <span>I</span> 背包 · <span>R</span> 技能 · <span>Tab</span> 工坊 · <span>F5</span> 存档
+        <span>Q</span> 任务 · <span>I</span> 背包 · <span>R</span> 技能 · <span>P</span> 配方 · <span>U</span> 成就<br>
+        <span>Tab</span> 工坊 · <span>F5</span> 存档
       </div>
     </div>
   </div>
@@ -151,6 +164,8 @@
   <script src="js/landmarks.js"></script>
   <script src="js/inventory.js"></script>
   <script src="js/abilities.js"></script>
+  <script src="js/recipes.js"></script>
+  <script src="js/achievements.js"></script>
   <script src="js/clay.js"></script>
   <script src="js/spell.js"></script>
   <script src="js/character.js"></script>

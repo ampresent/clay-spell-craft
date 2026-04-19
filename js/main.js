@@ -123,6 +123,10 @@
       if (ip.style.display !== 'none') ip.style.display = 'none';
       const ap = document.getElementById('abilities-panel');
       if (ap.style.display !== 'none') ap.style.display = 'none';
+      const rp = document.getElementById('recipes-panel');
+      if (rp.style.display !== 'none') rp.style.display = 'none';
+      const achp = document.getElementById('achievements-panel');
+      if (achp.style.display !== 'none') achp.style.display = 'none';
     });
 
     // Q key for quest panel, I for inventory, F5 for save
@@ -134,6 +138,10 @@
         toggleInventoryPanel();
       } else if (e.code === 'KeyR') {
         toggleAbilitiesPanel();
+      } else if (e.code === 'KeyP') {
+        toggleRecipesPanel();
+      } else if (e.code === 'KeyU') {
+        toggleAchievementsPanel();
       } else if (e.code === 'F5') {
         e.preventDefault();
         doSave();
@@ -158,6 +166,11 @@
         Characters.update(gameTime);
         DayNight.update(delta);
         Weather.update(delta, gameTime);
+
+        // Achievement tracking
+        if (DayNight.isNight()) Achievements.track('night');
+        if (Weather.getCurrentWeather() === 'rain') Achievements.track('rain');
+        Achievements.track('assistants', ClaySystem.getAssistants().length);
 
         // Update time display
         const timeStr = DayNight.getTimeString();
@@ -195,6 +208,7 @@
     ParticlesBg.stop();
     UI.hideTitle();
     UI.showHUD();
+    Achievements.complete('first_steps');
 
     const canvas = document.getElementById('game-canvas');
     Engine.lockPointer(canvas);
@@ -278,6 +292,7 @@
         const data = npc.userData.data;
         UI.showNPCDialog(data, 'greeting');
         AudioSystem.playSFX('dialog');
+        Achievements.track('npc', npc.userData.npcKey);
 
         if (npc.userData.npcKey === 'elder') {
           QuestSystem.completeObjective('first_steps', 'talk_elder');
@@ -298,6 +313,7 @@
       Inventory.add('clay', amount);
       node.userData.amount -= amount;
       AudioSystem.playSFX('harvest');
+      Achievements.track('harvest');
       SpellSystem.castAt(target.point);
 
       QuestSystem.completeObjective('first_steps', 'harvest_clay');
@@ -341,6 +357,7 @@
 
     AudioSystem.playSFX('spell');
     ScreenFX.magicGlow(SpellSystem.SPELL_COLORS[SpellSystem.getCurrentSpell()]);
+    Achievements.track('spell', SpellSystem.getCurrentSpell());
     QuestSystem.completeObjective('first_steps', 'cast_spell');
   }
 
@@ -370,6 +387,29 @@
     const panel = document.getElementById('abilities-panel');
     if (panel.style.display === 'none' || !panel.style.display) {
       Abilities.render();
+      panel.style.display = 'block';
+      AudioSystem.playSFX('click');
+    } else {
+      panel.style.display = 'none';
+    }
+  }
+
+  function toggleRecipesPanel() {
+    const panel = document.getElementById('recipes-panel');
+    if (panel.style.display === 'none' || !panel.style.display) {
+      Recipes.render();
+      panel.style.display = 'block';
+      AudioSystem.playSFX('click');
+    } else {
+      panel.style.display = 'none';
+    }
+  }
+
+  function toggleAchievementsPanel() {
+    const panel = document.getElementById('achievements-panel');
+    if (panel.style.display === 'none' || !panel.style.display) {
+      Achievements.render();
+      document.getElementById('ach-count').textContent = `(${Achievements.getCount()}/${Achievements.getAll().length})`;
       panel.style.display = 'block';
       AudioSystem.playSFX('click');
     } else {
