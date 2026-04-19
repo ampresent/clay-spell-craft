@@ -33,6 +33,7 @@
     DayNight.init(scene);
     Weather.init(scene);
     AudioSystem.init();
+    Tooltip.init();
     UI.init();
 
     // Hide loading, show title
@@ -95,6 +96,8 @@
       if (qp.style.display !== 'none') qp.style.display = 'none';
       const ip = document.getElementById('inventory-panel');
       if (ip.style.display !== 'none') ip.style.display = 'none';
+      const ap = document.getElementById('abilities-panel');
+      if (ap.style.display !== 'none') ap.style.display = 'none';
     });
 
     // Q key for quest panel, I for inventory, F5 for save
@@ -104,6 +107,8 @@
         toggleQuestPanel();
       } else if (e.code === 'KeyI') {
         toggleInventoryPanel();
+      } else if (e.code === 'KeyR') {
+        toggleAbilitiesPanel();
       } else if (e.code === 'F5') {
         e.preventDefault();
         doSave();
@@ -314,6 +319,17 @@
     const panel = document.getElementById('inventory-panel');
     if (panel.style.display === 'none' || !panel.style.display) {
       Inventory.render();
+      panel.style.display = 'block';
+      AudioSystem.playSFX('click');
+    } else {
+      panel.style.display = 'none';
+    }
+  }
+
+  function toggleAbilitiesPanel() {
+    const panel = document.getElementById('abilities-panel');
+    if (panel.style.display === 'none' || !panel.style.display) {
+      Abilities.render();
       panel.style.display = 'block';
       AudioSystem.playSFX('click');
     } else {
