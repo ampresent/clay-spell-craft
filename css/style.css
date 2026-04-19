@@ -251,6 +251,14 @@ canvas#game-canvas { display: block; width: 100vw; height: 100vh; }
   width: 20px; height: 2px; background: #c87a4a;
   border-radius: 1px;
 }
+.tool-slot.active.fire-active { border-color: rgba(255,68,34,0.5); box-shadow: 0 0 16px rgba(255,68,34,0.15); }
+.tool-slot.active.fire-active::after { background: #ff4422; }
+.tool-slot.active.water-active { border-color: rgba(34,136,255,0.5); box-shadow: 0 0 16px rgba(34,136,255,0.15); }
+.tool-slot.active.water-active::after { background: #2288ff; }
+.tool-slot.active.wind-active { border-color: rgba(136,204,255,0.5); box-shadow: 0 0 16px rgba(136,204,255,0.15); }
+.tool-slot.active.wind-active::after { background: #88ccff; }
+.tool-slot.active.life-active { border-color: rgba(68,204,102,0.5); box-shadow: 0 0 16px rgba(68,204,102,0.15); }
+.tool-slot.active.life-active::after { background: #44cc66; }
 .tool-icon { font-size: 1.4rem; transition: transform 0.2s; }
 .tool-slot:hover .tool-icon { transform: scale(1.15); }
 .tool-name { font-size: 0.55rem; color: #5a4a3a; letter-spacing: 0.05em; }

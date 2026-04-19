@@ -33,8 +33,12 @@ const UI = (() => {
   }
 
   function selectTool(tool) {
-    document.querySelectorAll('.tool-slot').forEach(s => s.classList.remove('active'));
-    document.querySelector(`[data-tool="${tool}"]`).classList.add('active');
+    document.querySelectorAll('.tool-slot').forEach(s => {
+      s.classList.remove('active', 'fire-active', 'water-active', 'wind-active', 'life-active');
+    });
+    const slot = document.querySelector(`[data-tool="${tool}"]`);
+    slot.classList.add('active');
+    if (tool !== 'sculpt') slot.classList.add(`${tool}-active`);
     SpellSystem.setSpell(tool);
 
     // Update craft spell slot
