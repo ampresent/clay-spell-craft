@@ -2,83 +2,94 @@
 
 一个 WebGL 魔法世界游戏 —— 在这里，所有人都捏黏土、注入魔法，来创造属于自己的魔法助手。
 
-🔗 **在线游玩**: https://github.com/ampresent/clay-spell-craft
+🔗 **仓库**: https://github.com/ampresent/clay-spell-craft
 
-## 🌍 游戏世界观
+## 🌍 泥灵界
 
-在 **泥灵界 (Clayrealm)** 中，万物皆由魔法黏土构成。这里的住民被称为 **塑灵师 (Claymancers)**，他们通过揉捏、塑造黏土，并注入不同的魔法元素，创造出各种有生命的助手。
+在 **泥灵界 (Clayrealm)** 中，万物皆由魔法黏土构成。作为 **塑灵师 (Claymancer)**，你将探索这个世界，采集黏土、释放魔法、创造助手、战斗怪物、挑战Boss。
 
-## 🎮 操作方式
+## 🎮 操作
 
-| 按键 | 操作 |
-|------|------|
-| WASD | 移动 |
-| 鼠标 | 视角 |
-| 左键 | 释放魔法 |
-| E | 交互（采集/对话） |
-| Q | 任务日志 |
-| I | 背包 |
-| R | 技能面板 |
-| P | 配方图鉴 |
-| U | 成就面板 |
-| Tab | 工坊 |
-| F5 | 存档 |
-| Esc | 设置 |
-| 1-5 | 切换工具 |
+| 按键 | 功能 | 按键 | 功能 |
+|------|------|------|------|
+| WASD | 移动 | Q | 任务日志 |
+| 鼠标 | 视角 | I | 背包 |
+| 左键 | 施法/攻击 | R | 技能 |
+| E | 交互 | P | 配方图鉴 |
+| 1-5 | 切换魔法 | U | 成就 |
+| Tab | 工坊 | T | 统计 |
+| F | 商店 | M | 世界地图 |
+| F5 | 存档 | Esc | 设置 |
 
-## 🧱 核心玩法
+## 🎯 核心系统
 
-- **捏黏土** — 采集魔法黏土矿
-- **注入魔法** — 火/水/风/生命四种元素
-- **造助手** — 创造可爱的助手跟随你
-- **探索世界** — 发现地标、收集品、稀有黏土
-- **完成任务** — 推进主线剧情
-- **解锁成就** — 挑战各种成就
+### 世界探索
+- 🗺️ 7个区域：工坊区/萤光森林/魔力湖畔/远古遗迹/水晶谷/风暴高地/暗影沼泽
+- 📍 6个地标 + 5个隐藏地点
+- 💎 20个收集品散布世界
+- 🌅 昼夜循环 + 4种天气
 
-## 🏗️ 技术架构
+### 战斗系统
+- ⚔️ 5种怪物：泥浆史莱姆/火焰游魂/风暴幽光/黏土傀儡/暗影黏土
+- 👑 2个Boss：黏土之王(Lv.5)/水晶龙(Lv.8)
+- 🎯 锥形瞄准 + 伤害计算
+- 💀 死亡重生机制
+
+### 创造系统
+- 🧱 黏土采集 → 工坊创造 → 助手跟随
+- 📋 9种配方（3级进阶）
+- 🔥💧🌪️🌿 4种魔法元素
+- 🤖 助手AI自动跟随
+
+### 成长系统
+- ⭐ 等级/经验/升级
+- ⚡ 6个技能树
+- 🏆 13个成就（含隐藏）
+- 🐰🦊🟢 3种宠物
+
+### 经济系统
+- 🏪 NPC商店（5种商品）
+- 💎 水晶货币
+- 🎒 背包管理
+
+### 社交系统
+- 👴 泥爷爷（新手引导）
+- 🧑‍🌾 阿泥（商人+世界传说）
+- 👩‍🔬 瓷小姐（黏土研究）
+- 👻 夜语（夜间幽灵NPC）
+
+## 🏗️ 技术栈
+
+- **渲染**: Three.js (WebGL)
+- **音频**: Web Audio API（程序化音效+音乐）
+- **存档**: localStorage
+- **无依赖**: 纯前端，CDN加载Three.js
+
+## 📁 项目结构 (42个JS模块)
 
 ```
-js/
-├── engine.js        # Three.js 渲染引擎、输入系统
-├── world.js         # 程序化地形、天空着色器
-├── structures.js    # 建筑：工坊、祭坛、树木
-├── water.js         # 水域：池塘、溪流、瀑布
-├── effects.js       # 粒子：萤火虫、浮尘、符文
-├── landmarks.js     # POI地标标记
-├── collectibles.js  # 探索收集品
-├── clay.js          # 黏土系统、助手AI跟随
-├── spell.js         # 魔法粒子特效
-├── character.js     # NPC对话树
-├── quest.js         # 任务系统（5条主线）
-├── achievements.js  # 成就系统（13个成就）
-├── recipes.js       # 配方图鉴（9种配方）
-├── inventory.js     # 背包系统
-├── abilities.js     # 技能树（6个技能）
-├── daynight.js      # 昼夜循环
-├── weather.js       # 天气系统（晴/雾/雨/魔力）
-├── audio.js         # Web Audio 音效
-├── save.js          # 存档系统
-├── settings.js      # 设置面板
-├── ui.js            # HUD、对话、工坊面板
-├── minimap.js       # 增强小地图
-├── compass.js       # 罗盘指南针
-├── notify.js        # 通知队列系统
-├── tooltip.js       # 悬浮提示
-├── interact-prompt.js # 上下文交互提示
-├── screenfx.js      # 屏幕特效（暗角/闪光）
-├── particles-bg.js  # 标题画面粒子背景
-└── main.js          # 入口、游戏循环
+核心: engine.js, main.js, player.js
+世界: world.js, structures.js, water.js, zones.js
+环境: effects.js, landmarks.js, collectibles.js, secrets.js
+战斗: enemies.js, bosses.js
+角色: character.js, night-events.js, pets.js
+创造: clay.js, spell.js, recipes.js
+成长: abilities.js, achievements.js, stats.js
+经济: inventory.js, shop.js
+世界: daynight.js, weather.js
+任务: quest.js
+音频: audio.js, music.js
+界面: ui.js, minimap.js, compass.js, worldmap.js,
+      notify.js, tooltip.js, interact-prompt.js,
+      screenfx.js, trail.js, particles-bg.js
+数据: save.js, settings.js
 ```
 
-## 🎨 特色系统
+## 📊 代码统计
 
-- 🌅 昼夜循环 + 动态光照
-- 🌧️ 天气系统自动切换
-- 🎵 Web Audio 程序化音效
-- 💾 localStorage 存档
-- 🗺️ 实时小地图 + 罗盘
-- 📜 任务追踪侧栏
-- 🏆 成就系统
+- **25 个 commit**
+- **42 个 JS 模块**
+- **~7800 行代码**
 
 ## 📜 License
 
